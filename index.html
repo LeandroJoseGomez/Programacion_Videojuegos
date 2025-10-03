@@ -1,0 +1,278 @@
+<!--
+  GameHub - Plantilla HTML/CSS/JS (single-file)
+  ------------------------------------------------
+  - Esta página muestra una lista de juegos, un panel de descripción y un área para "Jugar".
+  - Tú añadirás tus juegos en el arreglo `games` dentro del script.
+  - Cada juego puede apuntar a un archivo HTML/JS/CSS (por ejemplo: "games/mysnake/index.html") que se cargará en el iframe cuando el usuario haga clic en "Jugar".
+  - No requiere frameworks ni librerías externas. Todo en un solo archivo.
+
+  Cómo añadir un juego (ejemplo dentro del script):
+  {
+    id: 'snake',
+    title: 'Snake',
+    desc: 'Come manzanas y crece. Controles: flechas del teclado.',
+    thumb: '', // opcional: URL a imagen o emoji
+    src: 'games/snake/index.html', // ruta al juego (puede ser relativa)
+    embed: false // si true, se mostrará HTML en la zona de embed en vez de iframe
+  }
+
+  Nota sobre seguridad: los navegadores suelen bloquear ejecución de archivos locales en iframes por permisos.
+  Al desarrollar, sirve la carpeta desde un servidor local (por ejemplo `npx serve` o `python -m http.server`).
+-->
+
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GameHub — Plantilla</title>
+  <style>
+    :root{
+      --bg1:#0f1724; --bg2:#071032; --glass: rgba(255,255,255,0.04);
+      --accent1:#7c3aed; --accent2:#06b6d4; --muted:#9aa4b2;
+      --card: rgba(255,255,255,0.03);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.12), transparent),
+                  radial-gradient(900px 400px at 95% 85%, rgba(6,182,212,0.08), transparent),
+                  linear-gradient(180deg,var(--bg1),var(--bg2));
+      color:#e6eef8; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+      padding:24px;
+    }
+
+    .container{max-width:1200px;margin:0 auto}
+    header{display:flex;align-items:center;gap:16px;justify-content:space-between}
+    h1{margin:0;font-size:28px}
+    p.lead{margin:2px 0 0;color:var(--muted)}
+
+    /* layout */
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:20px;margin-top:22px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+
+    /* left: games list */
+    .games{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    @media (max-width:1100px){.games{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:600px){.games{grid-template-columns:repeat(1,1fr)}}
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.04); padding:14px; border-radius:12px; display:flex;gap:12px;align-items:center;
+      transition:transform .18s ease, box-shadow .18s ease; cursor:pointer; position:relative; overflow:hidden;
+    }
+    .card:hover{transform:translateY(-6px) scale(1.02); box-shadow:0 10px 30px rgba(2,6,23,0.6)}
+    .thumb{width:64px;height:64px;flex:0 0 64px;border-radius:10px;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:28px}
+    .meta{flex:1}
+    .meta h3{margin:0;font-size:16px}
+    .meta p{margin:6px 0 0;color:var(--muted);font-size:13px}
+    .card small{color:var(--muted)}
+
+    .actions{display:flex;gap:8px}
+    .btn{background:linear-gradient(90deg,var(--accent1),var(--accent2));border:none;color:white;padding:8px 10px;border-radius:999px;font-weight:600;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+
+    /* right column: description + play area */
+    .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.04)}
+    .desc{min-height:140px}
+    .play-area{margin-top:12px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.03)}
+    .placeholder{display:flex;align-items:center;justify-content:center;height:260px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));color:var(--muted);font-size:15px}
+
+    iframe.gameframe{width:100%;height:360px;border:0;background:white}
+
+    /* modal for large preview */
+    .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(2,6,23,0.6);z-index:60}
+    .modal .box{width:92%;max-width:1000px;background:var(--bg1);padding:12px;border-radius:12px}
+
+    /* small flourishes */
+    .badge{display:inline-block;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.03);font-size:12px}
+
+    /* tiny animation for header accent */
+    .logo-blob{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:inline-block;box-shadow:0 6px 20px rgba(6,182,212,0.08);transform-origin:center center;animation:blob 3s infinite}
+    @keyframes blob{0%{transform:scale(1)}50%{transform:scale(1.08) rotate(6deg)}100%{transform:scale(1)}}
+
+    footer{color:var(--muted);margin-top:18px;text-align:center;font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span class="logo-blob" aria-hidden></span>
+          <h1>GameHub</h1>
+        </div>
+        <p class="lead">Plantilla lista para que agregues tus juegos. Haz clic en un título para ver la descripción y "Jugar" para cargar tu archivo.</p>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="badge">Plantilla</div>
+        <div class="badge">Sin frameworks</div>
+      </div>
+    </header>
+
+    <main class="grid">
+      <section>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <h2 style="margin:18px 0 8px">Juegos disponibles</h2>
+          <div style="color:var(--muted);font-size:13px">Haz clic en una tarjeta para seleccionar</div>
+        </div>
+
+        <div id="games" class="games">
+          <!-- tarjetas generadas por JS -->
+        </div>
+
+      </section>
+
+      <aside class="panel">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+          <div>
+            <h3 id="game-title">Selecciona un juego</h3>
+            <div id="meta" style="color:var(--muted);margin-top:6px">Verás la descripción y la opción para jugar aquí</div>
+          </div>
+          <div class="actions">
+            <button id="play-btn" class="btn" disabled>Jugar</button>
+            <button id="open-btn" class="btn ghost" disabled>Abrir en ventana</button>
+          </div>
+        </div>
+
+        <div class="desc" id="game-desc">
+          <p style="color:var(--muted)">Sin juego seleccionado. Agrega tus entradas en el script dentro del arreglo <code>games</code>.</p>
+        </div>
+
+        <div class="play-area" id="play-area">
+          <div class="placeholder" id="play-placeholder">Área de juego (iframe/embebido)</div>
+        </div>
+      </aside>
+    </main>
+
+    <footer>Sirve la carpeta con un servidor local para evitar problemas de ejecución de iframes locales.</footer>
+  </div>
+
+  <script>
+    // --------- CONFIG: añade tus juegos aquí ---------
+    // Propiedades:
+    // id: string único
+    // title: nombre visible
+    // desc: descripción corta o HTML
+    // thumb: url a imagen o emoji (opcional)
+    // src: ruta al archivo del juego (HTML) que será cargado en el iframe
+    // embed: si true, `src` se insertará como HTML en vez de iframe (usa con precaución)
+    const games = [
+      // ejemplo (descomenta y ajusta cuando tengas tu juego):
+      { id: 'ejemplo', title: 'Space Adventure', desc: 'Este es un ejemplo. Sustituye con tu propio juego.', thumb: '🎮', src: 'SpaceAdventure.html', embed: false }
+    ];
+
+    // --------- LÓGICA UI (no necesitas tocar esto) ---------
+    const $games = document.getElementById('games');
+    const $title = document.getElementById('game-title');
+    const $desc = document.getElementById('game-desc');
+    const $playArea = document.getElementById('play-area');
+    const $placeholder = document.getElementById('play-placeholder');
+    const $playBtn = document.getElementById('play-btn');
+    const $openBtn = document.getElementById('open-btn');
+
+    let selected = null;
+
+    function renderCards(){
+      $games.innerHTML = '';
+      if(games.length === 0){
+        $games.innerHTML = '<div style="grid-column:1/-1;padding:22px;background:rgba(255,255,255,0.02);border-radius:10px;color:var(--muted)">No hay juegos añadidos. Edita el archivo y añade entradas en el arreglo <code>games</code>.</div>';
+        return;
+      }
+
+      for(const g of games){
+        const card = document.createElement('button');
+        card.className = 'card';
+        card.setAttribute('data-id', g.id);
+        card.innerHTML = `
+          <div class="thumb">${g.thumb || '🎲'}</div>
+          <div class="meta">
+            <h3>${escapeHtml(g.title)}</h3>
+            <p>${escapeHtml(truncate(g.desc||'', 80))}</p>
+            <small>${g.src ? 'Local: '+escapeHtml(g.src) : 'Sin fuente'}</small>
+          </div>
+        `;
+        card.addEventListener('click', ()=> selectGame(g));
+        $games.appendChild(card);
+      }
+    }
+
+    function selectGame(g){
+      selected = g;
+      $title.textContent = g.title || 'Sin título';
+      $desc.innerHTML = g.desc ? (typeof g.desc === 'string' ? sanitizeHtml(g.desc) : g.desc) : '<p style="color:var(--muted)">Sin descripción.</p>';
+      $playBtn.disabled = !g.src;
+      $openBtn.disabled = !g.src;
+
+      // animación ligera
+      $title.animate([{opacity:0, transform:'translateY(-6px)'},{opacity:1, transform:'translateY(0)'}],{duration:260,easing:'ease-out'});
+
+      // reset area
+      $playArea.querySelectorAll('*').forEach(n=> n.remove());
+      const placeholder = document.createElement('div');
+      placeholder.className='placeholder';
+      placeholder.textContent = 'Haz clic en Jugar para cargar el juego aquí.';
+      $playArea.appendChild(placeholder);
+      $placeholder.style.display='none';
+    }
+
+    function loadGameInIframe(g){
+      if(!g || !g.src) return;
+      // limpia
+      $playArea.innerHTML = '';
+
+      if(g.embed){
+        const wrap = document.createElement('div');
+        wrap.style.padding='12px'; wrap.style.minHeight='360px'; wrap.style.background='white'; wrap.style.color='black';
+        // precaución: insertar HTML directamente. Se asume que confías en el contenido.
+        fetch(g.src).then(r=>r.text()).then(html=>{
+          wrap.innerHTML = html;
+        }).catch(e=>{
+          wrap.innerHTML = '<div style="padding:18px;color:var(--muted)">No se pudo cargar el embed: '+e.message+'</div>';
+        });
+        $playArea.appendChild(wrap);
+        return;
+      }
+
+      const iframe = document.createElement('iframe');
+      iframe.className='gameframe';
+      iframe.src = g.src;
+      iframe.sandbox = 'allow-scripts allow-same-origin allow-forms allow-modals';
+      $playArea.appendChild(iframe);
+
+      // boton abrir en nueva ventana
+      $openBtn.onclick = ()=> window.open(g.src, '_blank');
+    }
+
+    $playBtn.addEventListener('click', ()=>{
+      if(!selected) return;
+      loadGameInIframe(selected);
+    });
+
+    // helpers
+    function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function truncate(s,n){ return s && s.length>n ? s.slice(0,n-1)+'…' : s }
+
+    // sanitiza un subset de HTML (muy ligero): permite <b>,<i>,<em>,<strong>,<br>,<p>,<ul>,<li>,<ol>,<a>
+    function sanitizeHtml(input){
+      if(!input) return '';
+      const allowed = /<(\/)?(b|i|em|strong|br|p|ul|li|ol|a)([^>]*)>/gi;
+      return input.replace(/</g, '&lt;').replace(/>/g,'&gt;').replace(allowed, (m,slash,tag,attrs)=>{
+        if(tag === 'a'){
+          // permitir href sencillas
+          const href = (attrs||'').match(/href\s*=\s*"([^"]+)"/i);
+          return `<${slash||''}a${href?` href="${escapeHtml(href[1])}" target="_blank" rel="noopener"`:''}>`;
+        }
+        return `<${slash||''}${tag}>`;
+      });
+    }
+
+    // init
+    renderCards();
+
+    // Exponer helpers en window para que puedas agregar juegos desde la consola si quieres
+    window.GameHub = { games, renderCards, selectGame };
+  </script>
+</body>
+</html>
