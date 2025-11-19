@@ -1,0 +1,132 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="360" viewBox="0 0 480 360" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Fondo de galaxia">
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="bgGrad" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#060014"></stop>
+      <stop offset="45%" stop-color="#0b1636"></stop>
+      <stop offset="100%" stop-color="#0b0030"></stop>
+    </linearGradient>
+
+    <!-- Nebula gradients -->
+    <radialGradient id="nebula1" cx="30%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.95"></stop>
+      <stop offset="45%" stop-color="#7c3aed" stop-opacity="0.45"></stop>
+      <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"></stop>
+    </radialGradient>
+    <radialGradient id="nebula2" cx="70%" cy="65%" r="60%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.9"></stop>
+      <stop offset="40%" stop-color="#0891b2" stop-opacity="0.38"></stop>
+      <stop offset="100%" stop-color="#0891b2" stop-opacity="0"></stop>
+    </radialGradient>
+    <radialGradient id="nebula3" cx="60%" cy="25%" r="40%">
+      <stop offset="0%" stop-color="#f97316" stop-opacity="0.9"></stop>
+      <stop offset="50%" stop-color="#fb923c" stop-opacity="0.24"></stop>
+      <stop offset="100%" stop-color="#fb923c" stop-opacity="0"></stop>
+    </radialGradient>
+
+    <!-- Star glow filter -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2.2" result="blur"></feGaussianBlur>
+      <feMerge>
+        <feMergeNode in="blur"></feMergeNode>
+        <feMergeNode in="SourceGraphic"></feMergeNode>
+      </feMerge>
+    </filter>
+
+    <!-- Small subtle noise to give texture (using tiny circles repeated) -->
+    <pattern id="grain" width="8" height="8" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="2" r="0.5" fill="#ffffff" opacity="0.02"></circle>
+      <circle cx="6" cy="5" r="0.6" fill="#ffffff" opacity="0.02"></circle>
+    </pattern>
+
+    <!-- A few radial gradients for bright stars -->
+    <radialGradient id="starGradA" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="1"></stop>
+      <stop offset="50%" stop-color="#ffe585" stop-opacity="0.6"></stop>
+      <stop offset="100%" stop-color="#ff7ab6" stop-opacity="0"></stop>
+    </radialGradient>
+
+    <radialGradient id="starGradB" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="1"></stop>
+      <stop offset="50%" stop-color="#c7f9ff" stop-opacity="0.6"></stop>
+      <stop offset="100%" stop-color="#06b6d4" stop-opacity="0"></stop>
+    </radialGradient>
+
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="url(#bgGrad)"></rect>
+
+  <!-- Nebula layers -->
+  <g id="nebulas" opacity="0.95">
+    <ellipse cx="140" cy="120" rx="220" ry="110" fill="url(#nebula1)" filter="url(#glow)"></ellipse>
+    <ellipse cx="360" cy="240" rx="200" ry="120" fill="url(#nebula2)" filter="url(#glow)" opacity="0.92"></ellipse>
+    <ellipse cx="320" cy="80" rx="130" ry="70" fill="url(#nebula3)" filter="url(#glow)" opacity="0.95"></ellipse>
+    <!-- Soft overlapping fog shapes -->
+    <path d="M30 280 C110 220, 220 300, 300 240 C380 180, 420 260, 460 220 L460 340 L30 340 Z" fill="#3b083f" fill-opacity="0.05"></path>
+  </g>
+
+  <!-- Big glowing core / galactic center -->
+  <g transform="translate(240,180)">
+    <circle r="36" fill="url(#starGradA)" opacity="0.95"></circle>
+    <circle r="80" fill="url(#starGradB)" opacity="0.18"></circle>
+  </g>
+
+  <!-- Field of small stars -->
+  <g id="stars-small" fill="#ffffff" opacity="0.95">
+    <!-- Generated/stylized scatter of stars -->
+    <!-- cluster 1 -->
+    <circle cx="40" cy="30" r="0.9" opacity="0.9"></circle>
+    <circle cx="70" cy="50" r="0.6" opacity="0.8"></circle>
+    <circle cx="110" cy="28" r="0.5" opacity="0.6"></circle>
+    <circle cx="160" cy="60" r="0.7" opacity="0.85"></circle>
+    <circle cx="200" cy="40" r="0.5" opacity="0.6"></circle>
+    <!-- cluster 2 -->
+    <circle cx="300" cy="90" r="0.6" opacity="0.9"></circle>
+    <circle cx="330" cy="120" r="0.8" opacity="0.95"></circle>
+    <circle cx="280" cy="140" r="0.5" opacity="0.7"></circle>
+    <circle cx="350" cy="70" r="0.6" opacity="0.8"></circle>
+    <!-- spread -->
+    <circle cx="420" cy="30" r="0.4" opacity="0.6"></circle>
+    <circle cx="90" cy="190" r="0.4" opacity="0.6"></circle>
+    <circle cx="240" cy="20" r="0.5" opacity="0.7"></circle>
+    <circle cx="400" cy="200" r="0.7" opacity="0.9"></circle>
+    <circle cx="60" cy="260" r="0.5" opacity="0.6"></circle>
+    <circle cx="180" cy="300" r="0.6" opacity="0.75"></circle>
+    <circle cx="260" cy="260" r="0.4" opacity="0.6"></circle>
+    <circle cx="330" cy="300" r="0.7" opacity="0.9"></circle>
+    <circle cx="440" cy="320" r="0.4" opacity="0.6"></circle>
+  </g>
+
+  <!-- Some brighter stars with glow -->
+  <g id="bright-stars" filter="url(#glow)" opacity="0.95">
+    <circle cx="350" cy="40" r="3.5" fill="white"></circle>
+    <circle cx="350" cy="40" r="8" fill="url(#starGradB)" opacity="0.55"></circle>
+    <circle cx="120" cy="210" r="2.6" fill="white"></circle>
+    <circle cx="120" cy="210" r="6.6" fill="url(#starGradA)" opacity="0.46"></circle>
+    <circle cx="220" cy="140" r="2.1" fill="white"></circle>
+    <circle cx="220" cy="140" r="5.4" fill="url(#starGradB)" opacity="0.45"></circle>
+  </g>
+
+  <!-- Subtle texture / grain -->
+  <rect width="100%" height="100%" fill="url(#grain)"></rect>
+
+  <!-- Optional faint spiral arcs to suggest galaxy arms -->
+  <g opacity="0.12" stroke="#ffffff" stroke-width="1" fill="none" stroke-linecap="round">
+    <path d="M240 180
+             C 340 110, 420 90, 460 80" stroke-linejoin="round"></path>
+    <path d="M240 180
+             C 160 250, 90 290, 40 310" stroke-linejoin="round"></path>
+    <path d="M240 180
+             C 310 200, 360 220, 420 240" stroke-linejoin="round"></path>
+  </g>
+
+  <!-- small vignette -->
+  <radialGradient id="vignette" cx="50%" cy="50%" r="75%">
+    <stop offset="60%" stop-color="#000000" stop-opacity="0"></stop>
+    <stop offset="100%" stop-color="#000000" stop-opacity="0.45"></stop>
+  </radialGradient>
+  <rect width="100%" height="100%" fill="url(#vignette)"></rect>
+
+</svg>
